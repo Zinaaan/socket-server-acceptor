@@ -1,6 +1,7 @@
 package server;
 
 import lombok.extern.slf4j.Slf4j;
+import org.agrona.nio.NioSelectedKeySet;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class SocketServerAcceptor implements Runnable, Closeable, ToIntFunction<
     public void run() {
         while (isRunning) {
             try {
-                // Blocked, waiting for the ongoing socket coming
+                // Blocked for selectTimeMillis, waiting for the ongoing socket coming
                 selector.select(selectTimeMillis);
                 selectedKeySet.forEach(this);
             } catch (IOException e) {
@@ -66,7 +67,6 @@ public class SocketServerAcceptor implements Runnable, Closeable, ToIntFunction<
         if (!key.isValid()) {
             return 0;
         }
-
         if (key.isAcceptable()) {
             ServerSocketChannel socketChannel = (ServerSocketChannel) key.channel();
             // Get current socket channel for given connection

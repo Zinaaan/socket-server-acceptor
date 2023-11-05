@@ -2,6 +2,7 @@ package server;
 
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.OneToOneConcurrentArrayQueue;
+import org.agrona.nio.NioSelectedKeySet;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -82,6 +83,9 @@ public class DataProcessor implements Runnable, Closeable, ToIntFunction<Selecti
     }
 
     private void checkForNewConnections() {
+        if(channelQueue.isEmpty()){
+            return;
+        }
         SocketChannel channel = channelQueue.poll();
         if (channel != null) {
             try {
